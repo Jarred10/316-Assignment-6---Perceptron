@@ -51,16 +51,13 @@ public class Perceptron {
 			
 			double error = Integer.valueOf(actualValue) - activationFunctionValue;
 			
-			double squaredError = Math.pow(error, 2) * 0.5;
-			if(error < 0) squaredError *= -1;
-			
-			double derived = derivitive(activationFunctionValue);
+			double derivative = activationFunctionValue * (1 - activationFunctionValue);
 			
 			for(int i = 0; i < 100; i++){
-				weights[i] = weights[i] + (alpha * (error * derived * Integer.valueOf(values[i])));
+				weights[i] = weights[i] + (alpha * (error * derivative * Integer.valueOf(values[i])));
 			}
 			
-			weights[100] = weights[100] + (alpha * (error * derived * BIAS));
+			weights[100] = weights[100] + (alpha * (error * derivative * BIAS));
 			
 			//System.out.println("Expected: " + expectedValue + ". Actual: " + actualValue + ". " + "Error: " + error);
 			
@@ -73,10 +70,6 @@ public class Perceptron {
 	
 	public static double sigmoid(double value){
 		return 1/(1 + Math.pow(Math.E, -value));
-	}
-	
-	public static double derivitive(double value){
-		return value * (1 - value);
 	}
 
 }
