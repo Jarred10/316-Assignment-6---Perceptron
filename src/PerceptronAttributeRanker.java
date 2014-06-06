@@ -11,11 +11,23 @@ public class PerceptronAttributeRanker {
 		HashSet<Integer> ignored = new HashSet<Integer>();
 
 		//bias input, always -1
-		final double BIAS = -1;
+		final int BIAS = -1;
+		
 		//alpha, user specified, defines the learning rate
 		final double alpha = Double.valueOf(args[1]);
 
+
+		Scanner s = new Scanner(new File(args[0]));
+		
 		//find headers
+		String[] headers = s.nextLine().split(",");
+		
+		int lineCount = 0;
+		
+		while(s.hasNextLine()){
+			s.nextLine();
+			lineCount++;
+		}
 
 		while(ignored.size() < 100){
 
@@ -24,18 +36,16 @@ public class PerceptronAttributeRanker {
 			double[] averageAbsoluteWeights = new double[101];
 
 			//total classification errors counter
-			int totalCorrectClassifications = 0;
-
-			int iterations = 0;
+			int correctClassifications = 0;
 			
-			Scanner s = new Scanner(new File(args[0]));
-			
-			String[] headers = s.nextLine().split(",");
+			//start reading data again
+			s = new Scanner(new File(args[0]));
+			//skip headers
+			s.nextLine();
 			
 			//while there is data left to work with
 			while(s.hasNextLine()){
-				iterations++;
-				double inputFunctionValue = 0;
+				double inputSum = 0;
 				String data = s.nextLine();
 				int[] values = new int[101];
 				for(int i = 0; i < values.length; i++){
@@ -48,24 +58,24 @@ public class PerceptronAttributeRanker {
 				}
 
 				for(int i = 0; i < 100; i++){
-					inputFunctionValue += (Integer.valueOf(values[i]) * weights[i]);
+					inputSum += (Integer.valueOf(values[i]) * weights[i]);
 				}
-				inputFunctionValue += weights[100] * BIAS;
+				inputSum +=  BIAS * weights[100];
 
-				inputFunctionValue = sigmoid(inputFunctionValue);
+				double output = sigmoid(inputSum);
 
-				int expectedValue = (int) Math.round(inputFunctionValue);
+				int expectedValue = (int) Math.round(output);
 
-				int actualValue = Integer.valueOf(values[100]);
+				int actualValue = values[100];
 
-				if(expectedValue == actualValue) totalCorrectClassifications++;
+				if(expectedValue == actualValue) correctClassifications++;
 
-				double error = Integer.valueOf(actualValue) - inputFunctionValue;
+				double error = Integer.valueOf(actualValue) - output;
 
-				double derivative = inputFunctionValue * (1 - inputFunctionValue);
+				double derivative = output * (1 - output);
 
 				for(int i = 0; i < 100; i++){
-					weights[i] = weights[i] + (alpha * (error * derivative * Integer.valueOf(values[i])));
+					weights[i] = weights[i] + (alpha * (error * derivative * values[i]));
 
 					averageAbsoluteWeights[i] += Math.abs(weights[i]);
 				}
@@ -87,7 +97,7 @@ public class PerceptronAttributeRanker {
 			}
 
 
-			System.out.println("Highest impact input: " + headers[index] + ", weight: " + averageAbsoluteWeights[index] / iterations + ". Correct classifications: " + totalCorrectClassifications);
+			System.out.println("Highest impact input: " + headers[index] + ", weight: " + averageAbsoluteWeights[index] / lineCount + ". Correct classifications: " + correctClassifications);
 
 			ignored.add(index);
 			

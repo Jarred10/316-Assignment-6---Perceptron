@@ -13,17 +13,16 @@ public class Perceptron {
 		//array of weights, with same indexes as columns in data
 		double[] weights = new double[101];
 		
-		
 		//bias input, always -1
 		final double BIAS = -1;
 		//alpha, user specified, defines the learning rate
 		final double alpha = Double.valueOf(args[1]);
 		
-		//find headers
-		String[] headers = s.nextLine().split(",");
+		//skip headers
+		s.nextLine();
 		
 		//total classification errors counter
-		int totalClassificationErrors = 0;
+		int classificationErrors = 0;
 		
 		//while there is data left to work with
 		while(s.hasNextLine()){
@@ -39,10 +38,10 @@ public class Perceptron {
 			}
 			
 			for(int i = 0; i < 100; i++){
-				inputSum += (Integer.valueOf(values[i]) * weights[i]);
+				inputSum += values[i] * weights[i];
 			}
 			
-			inputSum += weights[100] * BIAS;
+			inputSum += BIAS * weights[100];
 			
 			//sigmoid function
 			double output = 1/(1 + Math.pow(Math.E, -inputSum));
@@ -51,10 +50,10 @@ public class Perceptron {
 			int expectedValue = (int) Math.round(output);
 			
 			//value for polarity actually read in
-			int actualValue = Integer.valueOf(values[100]);
+			int actualValue = values[100];
 			
 			//increment error if our expected doesnt match actual
-			if(expectedValue != actualValue) totalClassificationErrors++;
+			if(expectedValue != actualValue) classificationErrors++;
 			
 			//error is equal to actual value minus output value
 			double error = actualValue - output;
@@ -64,22 +63,22 @@ public class Perceptron {
 			
 			//update weights
 			for(int i = 0; i < 100; i++){
-				weights[i] = weights[i] + (alpha * (error * derivative * Integer.valueOf(values[i])));
+				weights[i] = weights[i] + (alpha * (error * derivative * values[i]));
 			}
 			
 			//update the bias weight
 			weights[100] = weights[100] + (alpha * (error * derivative * BIAS));
 			
-			//System.out.println("Expected: " + expectedValue + ". Actual: " + actualValue + ". " + "Error: " + error);
+			//System.out.println("Expected: " + expectedValue + ". Actual: " + actualValue + ". " + "Error: " + error + ". Bias weight: " + weights[100]);
 			
 		}
 		
-		System.out.print("<" + weights[100] + ">");
+		System.out.print(weights[100] + ",");
 		for(int i = 0; i < 100; i++){
-			System.out.print("<" + weights[i] + ">");
+			System.out.print(weights[i] + (i < 99? "," : ""));
 		}
 		System.out.println();
-		System.out.println("<" + totalClassificationErrors + ">");
+		System.out.println(classificationErrors);
 		
 		s.close();
 	}
