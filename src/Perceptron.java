@@ -77,7 +77,9 @@ public class Perceptron {
 		for(int i = 0; i < 100; i++){
 			System.out.print(weights[i] + (i < 99? "," : ""));
 		}
+		
 		System.out.println();
+		
 		System.out.println(classificationErrors);
 		
 		s.close();
