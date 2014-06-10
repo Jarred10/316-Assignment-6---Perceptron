@@ -2,7 +2,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
-
+//1186602 - Jarred Green
 public class Perceptron {
 
 	public static void main(String[] args) throws FileNotFoundException {

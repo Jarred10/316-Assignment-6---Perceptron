@@ -1,16 +1,15 @@
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.LinkedHashSet;
-import java.util.Scanner;
 
+//1186602 - Jarred Green
 public class PerceptronAttributeRanker {
 
-	public static void main(String[] args) throws FileNotFoundException {
+	public static void main(String[] args) throws IOException {
 
-		//list of lines of the data, stored so we don't have to reread
-		ArrayList<String> data = new ArrayList<String>();
-
+		int lineCount = 0;
+		
 		//bias input, always -1
 		final int BIAS = -1;
 		
@@ -18,15 +17,14 @@ public class PerceptronAttributeRanker {
 		final double alpha = Double.valueOf(args[1]);
 
 		//read in file
-		Scanner s = new Scanner(new File(args[0]));
+		BufferedReader rd = new BufferedReader(new FileReader(args[0]));
 		
 		//store headers
-		String[] headers = s.nextLine().split(",");
+		String[] headers = rd.readLine().split(",");
 		
-		//construct list of lines in data
-		while(s.hasNextLine()) data.add(s.nextLine());
-
-		s.close();
+		while(rd.readLine() != null){
+			lineCount++;
+		}
 		
 		//linked hash set of all indexes of inputs to use
 		LinkedHashSet<Integer> currentInputs = new LinkedHashSet<Integer>();
@@ -38,6 +36,12 @@ public class PerceptronAttributeRanker {
 		
 		//while their are inputs left to test and remove
 		while(currentInputs.size() > 0){
+			
+			//read in the file again
+			rd = new BufferedReader(new FileReader(args[0]));
+			
+			//skip headers
+			rd.readLine();
 
 			//array of weights, with same indexes as columns in data
 			double[] weights = new double[101];
@@ -48,8 +52,11 @@ public class PerceptronAttributeRanker {
 			//total classification errors counter
 			int correctClassifications = 0;
 			
+			String line;
+			
 			//while there is data left to work with
-			for(String line : data){
+			while((line = rd.readLine()) != null){
+				
 				double inputSum = 0;
 				int[] values = new int[100];
 				for(int i = 0; i <= values.length; i++){
@@ -90,7 +97,7 @@ public class PerceptronAttributeRanker {
 
 			//set values to safe, non-null and impossible defaults
 			double largest = Double.NEGATIVE_INFINITY;
-			int index = -1;
+			int index = Integer.MIN_VALUE;
 
 			//for all current inputs, find the one with largest absolute weight
 			for(int input : currentInputs){
@@ -100,12 +107,14 @@ public class PerceptronAttributeRanker {
 				}
 			}
 
-			System.out.println("Highest impact input: " + headers[index] + ", weight: " + absoluteWeights[index] / data.size() + ". Correct classifications: " + correctClassifications);
+			System.out.println((100 - currentInputs.size()+1) + ". Highest impact input: " + headers[index] + ", weight: " + absoluteWeights[index] / lineCount + ". Correct classifications: " + correctClassifications);
 
 			//remove the most influencial input
 			currentInputs.remove(index);
 			
 		}
+		
+		rd.close();
 
 	}
 }
