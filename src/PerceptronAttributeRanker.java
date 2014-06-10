@@ -59,7 +59,7 @@ public class PerceptronAttributeRanker {
 				
 				double inputSum = 0;
 				int[] values = new int[100];
-				for(int i = 0; i <= values.length; i++){
+				for(int i = 0; i < values.length; i++){
 					//if we havent removed the input, get the value, else leave value as 0
 					if(currentInputs.contains(i)) values[i] = line.charAt(i*2) - '0';
 				}
