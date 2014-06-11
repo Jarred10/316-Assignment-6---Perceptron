@@ -1,13 +1,15 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 
-
+//1186602 - Jarred Green
 public class AdaptiveLearningRatePerceptron {
 	
 	//bias input, always -1
 	final static int BIAS = -1;
 
+	//weights for each learning rate
 	static double[] alphaWeights = new double[101];
 	static double[] gammaWeights = new double[101];
 	static double[] inverseGammaWeights = new double[101];
@@ -55,18 +57,26 @@ public class AdaptiveLearningRatePerceptron {
 				if(alphaErrors <= gammaErrors && alphaErrors <= inverseGammaErrors){
 					alphaNew = alpha;
 					totalErrors += alphaErrors;
+					gammaWeights = Arrays.copyOf(alphaWeights, alphaWeights.length);
+					inverseGammaWeights = Arrays.copyOf(alphaWeights, alphaWeights.length);
 				}
 				else if(gammaErrors <= alphaErrors && gammaErrors <= inverseGammaErrors){
 					alphaNew = gamma;
 					totalErrors += gammaErrors;
+					alphaWeights = Arrays.copyOf(gammaWeights, gammaWeights.length);
+					inverseGammaWeights = Arrays.copyOf(gammaWeights, gammaWeights.length);
 				}
 				else {
 					alphaNew = inverseGamma;
 					totalErrors += inverseGammaErrors;
+					alphaWeights = Arrays.copyOf(inverseGammaWeights, inverseGammaWeights.length);
+					gammaWeights = Arrays.copyOf(inverseGammaWeights, inverseGammaWeights.length);
 				}
 				
-				//reset old alpha values
+				//reset old error values
 				alphaErrors = 0; gammaErrors = 0; inverseGammaErrors = 0;
+				
+				
 				
 				alpha = alphaNew;
 
