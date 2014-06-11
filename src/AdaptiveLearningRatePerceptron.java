@@ -47,8 +47,11 @@ public class AdaptiveLearningRatePerceptron {
 		
 		String line;
 		int linesRead = 0;
+		//while their is data left
 		while((line = rd.readLine()) != null){
+			//if we have read the batch size
 			if(linesRead == batchSize){
+				//find new alpha
 				if(alphaErrors <= gammaErrors && alphaErrors <= inverseGammaErrors){
 					alphaNew = alpha;
 					totalErrors += alphaErrors;
@@ -62,11 +65,13 @@ public class AdaptiveLearningRatePerceptron {
 					totalErrors += inverseGammaErrors;
 				}
 				
+				//reset old alpha values
 				alphaErrors = 0; gammaErrors = 0; inverseGammaErrors = 0;
 				
 				alpha = alphaNew;
 
 				System.out.println("New alpha: " + alpha);
+				//find new gamma and inverse gamma values
 				gamma = _gamma * alpha;
 				inverseGamma = (1 / _gamma) * alphaNew;
 				linesRead = 0;
@@ -74,6 +79,7 @@ public class AdaptiveLearningRatePerceptron {
 			
 			linesRead++;
 			
+			//train on a line of data with each set of weights and each alpha value
 			alphaErrors += train(alpha, line, alphaWeights);
 			gammaErrors += train(gamma, line, gammaWeights);
 			inverseGammaErrors += train(inverseGamma, line, inverseGammaWeights);			
@@ -81,9 +87,9 @@ public class AdaptiveLearningRatePerceptron {
 		
 		System.out.println("Total errors: " + totalErrors);
 		
-		
 	}
 	
+	//trains the data using a specific weight set and alpha value
 	public static int train(double alpha, String data, double[] weights){
 		int classificationErrors = 0;
 		
@@ -122,7 +128,7 @@ public class AdaptiveLearningRatePerceptron {
 		//update the bias weight
 		weights[100] = weights[100] + (alpha * (error * derivative * BIAS));
 		
-		
+		//after the line of data is computed, return if we made an error
 		return classificationErrors;
 	}
 
